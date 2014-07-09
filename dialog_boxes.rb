@@ -105,10 +105,10 @@ def getfolderpath
   return path.read_string
 end
 
-def showmessage(msg="", tle="")
+def showmessage(msg="Message", tle="Title", type=3)
   # The last parameter determines the buttons
   # see:  http://msdn.microsoft.com/en-us/library/windows/desktop/ms645505(v=vs.85).aspx
-  rc = MessageBox.message_box(nil, msg, tle, 3)
+  rc = MessageBox.message_box(nil, msg, tle, type)
   return rc
 end
 
