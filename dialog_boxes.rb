@@ -80,22 +80,23 @@ module GetFile
   attach_function :CommDlgExtendedError, [], :uint
 end
 
-def getfilepath
+def getfilepath(tle="Open")
   ofn=OpenFileName.new
   #puts ofn.methods
   #gets
   #print ofn.size
   ofn[:lStructSize]=ofn.size
   ofn[:Flags]=0x00080000
-  ofn[:lpstrFile]=FFI::MemoryPointer.new(256) #from_string(" "*256)
+  ofn[:lpstrFile]=FFI::MemoryPointer.new(256) 
+  ofn[:lpstrTitle]=FFI::MemoryPointer.from_string(tle)
   ofn[:nMaxFile]=256
   rc=GetFile.GetOpenFileName(ofn)
   return ofn[:lpstrFile].read_string
 end
 
-def getfolderpath
+def getfolderpath(tle="Select folder.")
   bi=BrowseInfo.new
-  bi[:lpszTitle]=FFI::MemoryPointer.from_string('Select a folder.')
+  bi[:lpszTitle]=FFI::MemoryPointer.from_string(tle)
   bi[:ulFlags]=0x00000040
   
   rc = GetFolder.SHBrowseForFolder(bi)
@@ -112,7 +113,7 @@ def showmessage(msg="Message", tle="Title", type=3)
   return rc
 end
 
-puts showmessage("Message for you!", "Hello!")
-puts getfilepath
-puts getfolderpath
+#puts showmessage("Message for you!", "Hello!")
+#puts getfilepath("Select the file you want.")
+#puts getfolderpath("Select the folder you want.")
 
