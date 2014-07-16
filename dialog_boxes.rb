@@ -31,7 +31,7 @@ module GetFolder
   
 end
 
-module GetPath
+module IDtoPath
   extend FFI::Library
 
   ffi_lib 'shell32'
@@ -80,6 +80,14 @@ module GetFile
   attach_function :CommDlgExtendedError, [], :uint
 end
 
+module GetPath
+  extend FFI::Library
+  ffi_lib 'Kernel32'
+  ffi_convention :stdcall
+  
+  attach_function :get_path, :GetCurrentDirectoryA, [:uint,:pointer],:uint
+end
+
 def getfilepath(tle="Open")
   ofn=OpenFileName.new
   #puts ofn.methods
@@ -102,7 +110,7 @@ def getfolderpath(tle="Select folder.")
   rc = GetFolder.SHBrowseForFolder(bi)
 
   path=FFI::MemoryPointer.from_string(" "*256)
-  GetPath.SHGetPathFromIDList(rc, path)
+  IDtoPath.SHGetPathFromIDList(rc, path)
   return path.read_string
 end
 
@@ -113,7 +121,31 @@ def showmessage(msg="Message", tle="Title", type=3)
   return rc
 end
 
+def getcurrentpath
+  size=256
+  buffer=FFI::MemoryPointer.new(size)
+  rc=GetPath.get_path(size,buffer)
+  return buffer.read_string
+end
+
+module SetPath
+  extend FFI::Library
+  ffi_lib 'Kernel32'
+  ffi_convention :stdcall
+  
+  attach_function :set_path, :SetCurrentDirectoryA, [:pointer], :bool
+
+end
+
+def setcurrentpath(path)
+  buffer=FFI::MemoryPointer.from_string(path)
+  rc=SetPath.set_path(buffer)
+  return rc
+end
+
 #puts showmessage("Message for you!", "Hello!")
 #puts getfilepath("Select the file you want.")
 #puts getfolderpath("Select the folder you want.")
-
+#puts getcurrentpath
+#puts setcurrentpath('C:\\Users\\')
+#puts Dir.pwd
